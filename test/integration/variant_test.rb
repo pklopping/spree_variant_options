@@ -19,7 +19,6 @@ class ProductTest < ActionDispatch::IntegrationTest
 
     setup do
       Spree::Config[:track_inventory_levels] = true
-      Spree::Config[:allow_backorders] = false
       @product = Factory(:product)
       @size = Factory(:option_type)
       @color = Factory(:option_type, :name => "Color")
