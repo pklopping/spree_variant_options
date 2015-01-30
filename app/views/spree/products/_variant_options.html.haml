@@ -1,9 +1,9 @@
 - if @product.has_variants? 
   #product-variants
-    %h2 = t('variants')
+    %h2= t('variants')
     - index = 0
     - @product.grouped_option_values.each do |type, values|
-      %div{ id:"#{dom_id(type)}", class:"variant-options index-#{index}"
+      %div{ id:"#{dom_id(type)}", class:"variant-options index-#{index}"}
         %h6.variant-option-type
           = type.presentation
         %ul.variant-option-values
@@ -21,9 +21,9 @@
     :javascript
       :cdata
         var variant_options = new VariantOptions({
-          options: "#{@product.variant_options_hash.to_json}",
-          track_inventory_levels: "#{"!!Spree::Config[:track_inventory_levels]}",
+          options: = @product.variant_options_hash.to_json,
+          track_inventory_levels: = "!!Spree::Config[:track_inventory_levels],
           allow_backorders: false,
-          allow_select_outofstock: "#{!!SpreeVariantOptions::VariantConfig[:allow_select_outofstock]}",
-          default_instock: "#{!!SpreeVariantOptions::VariantConfig[:default_instock]}"
+          allow_select_outofstock: =!!SpreeVariantOptions::VariantConfig[:allow_select_outofstock],
+          default_instock: = !!SpreeVariantOptions::VariantConfig[:default_instock]
         });
