@@ -2,18 +2,28 @@
   #product-variants
     - index = 0
     - @product.grouped_option_values.each do |type, values|
-      %div{ id:"#{dom_id(type)}", class:"variant-options index-#{index}"}
-        %label= type.presentation
-        - select_opts = ["Select one"]
-        - disabled_opts = []
-        - values.sort_by(&:position).each do |v|
-          - unless (variants = @product.variants_for_option_value(v)).empty?
-            - if (variants.sum(&:total_on_hand) == 0)
-              - disabled_opts << v.name
-              - select_opts << [v.name + " out of stock", v.name, class: "out-of-stock"]
-            - else
-              - select_opts << [v.name, class: "in-stock"]
-        = select_tag type.presentation, options_for_select(select_opts, disabled: disabled_opts) , class: type.presentation
+      / - binding.pry()
+      - if type.name =~ /(.*)size(.*)/i
+        %div{ id:"#{dom_id(type)}", class:"variant-options index-#{index}"}
+          %label= type.presentation
+          - select_opts = ["Select one"]
+          - disabled_opts = []
+          - values.sort_by(&:position).each do |v|
+            - unless (variants = @product.variants_for_option_value(v)).empty?
+              - if (variants.sum(&:total_on_hand) == 0)
+                - disabled_opts << v.name
+                - select_opts << [v.name + " out of stock", v.name, class: "out-of-stock"]
+              - else
+                - select_opts << [v.name, class: "in-stock"]
+          = select_tag type.presentation, options_for_select(select_opts, disabled: disabled_opts) , class: type.presentation
+      - if type.name =~ /(.*)color(.*)/i
+        %div{ id:"#{dom_id(type)}", class:"variant-options index-#{index}"}
+          %label= type.presentation
+          .colors
+            - values.sort_by(&:position).each do |v|
+              - unless (variants = @product.variants_for_option_value(v)).empty?
+                - outOfStockClass = (variants.sum(&:total_on_hand) == 0) ? "out-of-stock" : "in-stock"
+                = image_tag v.image.url, class: "color #{outOfStockClass}"
         / %ul.variant-option-values
         / - values.sort_by(&:position).each do |value|
         /   - classes = ["option-value"]
