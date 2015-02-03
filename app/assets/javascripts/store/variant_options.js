@@ -222,16 +222,27 @@ function VariantOptions(params) {
     }
   }
 
-  // function clear(i) {
-  //   variant = null;
-  //   update(i);
-  //   enable(buttons.removeClass('selected'));
-  //   toggle();
-  //   parent.nextAll().each(function(index, element) {
-  //     disable($(element).find('a.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'));
-  //   });
-  //   show_all_variant_images();
-  // }
+  function clear_size(i) {
+    variant = null;
+    update(i);
+    enable_size(buttons.removeClass('selected'));
+    toggle();
+    parent.nextAll().each(function(index, element) {
+      disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'));
+    });
+    show_all_variant_images();
+  }
+
+  function clear_color(i) {
+    variant = null;
+    update(i);
+    enable(buttons.removeClass('selected'));
+    toggle();
+    parent.nextAll().each(function(index, element) {
+      disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'));
+    });
+    show_all_variant_images();
+  }
 
 
   // function handle_clear(evt) {
@@ -245,9 +256,9 @@ function VariantOptions(params) {
     selection = [];
     var a = $(this);
     a = a.find('option[value="'+a.val()+'"]')
-    // if (!parent.has(a).length) {
-    //   clear(divs.index(a.parents('.variant-options:first')));
-    // }
+    if (!parent.has(a).length) {
+      clear_size(divs.index(a.parents('.variant-options:first')));
+    }
     disable(buttons);
     var a = enable_size(a.addClass('selected'));
     advance();
