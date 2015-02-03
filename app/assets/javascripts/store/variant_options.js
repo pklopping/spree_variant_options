@@ -77,7 +77,6 @@ function VariantOptions(params) {
   }
 
   function enable_size(btns) {
-    console.log("ENABLE");
     bt = btns.not('.unavailable').removeClass('locked').unbind('click')
     if (!allow_select_outofstock && !allow_backorders)
       bt = bt.filter('.in-stock')
@@ -85,7 +84,6 @@ function VariantOptions(params) {
   }
 
   function enable_color(btns) {
-    console.log("ENABLE");
     bt = btns.not('.unavailable').removeClass('locked').unbind('click')
     if (!allow_select_outofstock && !allow_backorders)
       bt = bt.filter('.in-stock')
@@ -197,21 +195,17 @@ function VariantOptions(params) {
 
   function toggle() {
     if (variant) {
-      console.log("WARIANT");
       $('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val(variant.id);
       $('#product-price .price').removeClass('unselected').text(variant.price);
       if (variant.count > 0 || allow_backorders)
         $('#cart-form button[type=submit]').attr('disabled', false).fadeTo(100, 1);
       $('form[data-form-type="variant"] button[type=submit]').attr('disabled', false).fadeTo(100, 1);
       try {
-        console.log("BOOOOD");
         show_variant_images(variant.id);
       } catch(error) {
         // depends on modified version of product.js
-        console.log ("CRAP");
       }
     } else {
-      console.log("NARIANT");
       $('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val('');
       $('#cart-form button[type=submit], form[data-form-type="variant"] button[type=submit]').attr('disabled', true).fadeTo(0, 0.5);
       price = $('#product-price .price').addClass('unselected')
@@ -236,7 +230,7 @@ function VariantOptions(params) {
   function clear_color(i) {
     variant = null;
     update(i);
-    enable(buttons.removeClass('selected'));
+    enable_color(buttons.removeClass('selected'));
     toggle();
     parent.nextAll().each(function(index, element) {
       disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'));
@@ -251,7 +245,6 @@ function VariantOptions(params) {
   // }
 
   function handle_size_change(evt) {
-    console.log("CLEEK SEIZE");
     variant = null;
     selection = [];
     var a = $(this);
@@ -260,7 +253,9 @@ function VariantOptions(params) {
       clear_size(divs.index(a.parents('.variant-options:first')));
     }
     disable(buttons);
-    var a = enable_size(a.addClass('selected'));
+    if (a.val() != "Select one") {
+      var a = enable_size(a.addClass('selected'));
+    }8
     advance();
     if (find_variant()) {
       toggle();
@@ -268,14 +263,13 @@ function VariantOptions(params) {
   }
 
   function handle_color_change(evt) {
-    console.log("CLEEK COLOR");
     evt.preventDefault();
     variant = null;
     selection = [];
     var a = $(this);
-    // if (!parent.has(a).length) {
-    //   clear(divs.index(a.parents('.variant-options:first')));
-    // }
+    if (!parent.has(a).length) {
+      clear_color(divs.index(a.parents('.variant-options:first')));
+    }
     disable(buttons);
     var a = enable_color(a.addClass('selected'));
     advance();
