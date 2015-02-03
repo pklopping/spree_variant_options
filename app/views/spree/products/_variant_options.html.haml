@@ -2,9 +2,9 @@
   #product-variants
     - index = 0
     - @product.grouped_option_values.each do |type, values|
-      / - binding.pry()
       - if type.name =~ /(.*)size(.*)/i
-        %div{ id:"#{dom_id(type)}", class:"variant-options index-#{index}"}
+        - cool_class = "variant-options index-"+index.to_s
+        %div{id: dom_id(type), class: cool_class}
           %label= type.presentation
           - select_opts = ["Select one"]
           - disabled_opts = []
@@ -12,18 +12,20 @@
             - unless (variants = @product.variants_for_option_value(v)).empty?
               - if (variants.sum(&:total_on_hand) == 0)
                 - disabled_opts << v.name
-                - select_opts << [v.name + " out of stock", v.name, class: "out-of-stock"]
+                - select_opts << [v.name + " out of stock", v.name, class: "out-of-stock option-value"]
               - else
-                - select_opts << [v.name, class: "in-stock"]
-          = select_tag type.presentation, options_for_select(select_opts, disabled: disabled_opts) , class: type.presentation
+                - select_opts << [v.name, class: "in-stock option-value", data:{rel: "#{type.id}-#{v.id}"}]
+          = select_tag type.presentation, options_for_select(select_opts, disabled: disabled_opts) , class: type.presentation+" variant-option-values"
+      - index += 1
       - if type.name =~ /(.*)color(.*)/i
-        %div{ id:"#{dom_id(type)}", class:"variant-options index-#{index}"}
+        - cool_class = "variant-options index-"+index.to_s
+        %div{id: dom_id(type), class: cool_class}
           %label= type.presentation
           .colors
             - values.sort_by(&:position).each do |v|
               - unless (variants = @product.variants_for_option_value(v)).empty?
                 - outOfStockClass = (variants.sum(&:total_on_hand) == 0) ? "out-of-stock" : "in-stock"
-                = image_tag v.image.url, class: "color #{outOfStockClass}"
+                = image_tag v.image.url, class: "color #{outOfStockClass} option-value", data:{rel: "#{type.id}-#{v.id}"}
         / %ul.variant-option-values
         / - values.sort_by(&:position).each do |value|
         /   - classes = ["option-value"]
@@ -34,13 +36,5 @@
         /   %li.clear-option
         /     = link_to "X", "#clear", :class => "clear-button clear-index-#{index}"
         /   %li.clear
-      - index += 1
     = hidden_field_tag "products[#{@product.id}]", "", id: "variant_id", class: "hidden"
-    :cdata
-      var variant_options = new VariantOptions({
-        options: = @product.variant_options_hash.to_json,
-        track_inventory_levels: = "!!Spree::Config[:track_inventory_levels],
-        allow_backorders: false,
-        allow_select_outofstock: =!!SpreeVariantOptions::VariantConfig[:allow_select_outofstock],
-        default_instock: = !!SpreeVariantOptions::VariantConfig[:default_instock]
-      });
+    = render "init_variant_options_js"
