@@ -112,8 +112,6 @@ function VariantOptions(params) {
     sels.push(opt.data('rel'));
     //Grab selected color
 
-    debugger
-
     $.each(sels, function(key, value) {
       key = value.split('-');
       var v = options[key[0]][key[1]];
@@ -126,7 +124,7 @@ function VariantOptions(params) {
       }
     });
     btns.removeClass('in-stock out-of-stock unavailable').each(function(i, element) {
-      variants = get_variant_objects(element.data('rel'));
+      variants = get_variant_objects($(element).data('rel'));
       keys = $.keys(variants);
       if (keys.length == 0) {
         disable($(element).addClass('unavailable locked').unbind('click'));
@@ -179,7 +177,7 @@ function VariantOptions(params) {
 
   function find_variant() {
     var selected = divs.find('.selected');
-    var variants = get_variant_objects(selected.get(0).data('rel'));
+    var variants = get_variant_objects($(selected.get(0)).data('rel'));
     if (selected.length == divs.length) {
       return variant = variants[selection[0]];
     } else {
@@ -246,6 +244,7 @@ function VariantOptions(params) {
     variant = null;
     selection = [];
     var a = $(this);
+    a = a.find('option[value="'+a.val()+'"]')
     // if (!parent.has(a).length) {
     //   clear(divs.index(a.parents('.variant-options:first')));
     // }
