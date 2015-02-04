@@ -173,11 +173,16 @@ function VariantOptions(params) {
     return parseFloat(string.replace(/[^\d\.]/g, ''));
   }
 
-  function find_variant() {
-    var selected = divs.find('.selected');
-    var variants = get_variant_objects($(selected.get(0)).data('rel'));
+  function find_variant(selected_option) {
+    var selected = divs.find('.selected').not('li, select');
+    var variants = get_variant_objects(selected_option.data('rel'));
+    debugger
     if (selected.length == divs.length) {
-      return variant = variants[selection[0]];
+      if (count_variants(variants) == 1) {
+        return variant = variants[first_variant_key(variants)];
+      } else {
+        return variant = variants[selection[0]];
+      }
     } else {
       var prices = [];
       $.each(variants, function(key, value) { prices.push(value.price) });
@@ -190,6 +195,20 @@ function VariantOptions(params) {
         $('#product-price .price').html('<span class="price from">' + prices[0] + '</span> - <span class="price to">' + prices[prices.length - 1] + '</span>');
       }
       return false;
+    }
+  }
+
+  function count_variants(variants) {
+    count = 0;
+    for (key in variants) {
+      count++;
+    }
+    return count;
+  }
+
+  function first_variant_key(variants) {
+    for (key in variants) {
+      return key;
     }
   }
 
@@ -249,15 +268,16 @@ function VariantOptions(params) {
     selection = [];
     var a = $(this);
     a = a.find('option[value="'+a.val()+'"]')
+    selected_option = a
     if (!parent.has(a).length) {
       clear_size(divs.index(a.parents('.variant-options:first')));
     }
     disable(buttons);
-    if (a.val() != "Select one") {
+    if (a.val() != "Select one" && !a.is('li')) {
       var a = enable_size(a.addClass('selected'));
-    }8
+    }
     advance();
-    if (find_variant()) {
+    if (find_variant(selected_option)) {
       toggle();
     }
   }
@@ -271,9 +291,11 @@ function VariantOptions(params) {
       clear_color(divs.index(a.parents('.variant-options:first')));
     }
     disable(buttons);
-    var a = enable_color(a.addClass('selected'));
+    if (a.val() != "Select one" && !a.is('li')) {
+      var a = enable_size(a.addClass('selected'));
+    }
     advance();
-    if (find_variant()) {
+    if (find_variant($(this))) {
       toggle();
     }
   }
