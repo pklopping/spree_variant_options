@@ -1,7 +1,6 @@
 var show_variant_images = function(variant_id) {
-  console.log("SHOW VARIANT IMAGS");
-  $('.li.vtmb').hide();
-  $('.li.tmb-' + variant_id).show();
+  $('.li.vtmb').hide().removeClass("active");
+  $('.li.tmb-' + variant_id).show().addClass("active");
   var currentThumb = $('#' + $("#main-image").data('selectedThumbId'));
   // if currently selected thumb does not belong to current variant, nor to common images,
   // hide it and select the first available thumb instead.
