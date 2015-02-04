@@ -1,0 +1,40 @@
+- if @product.has_variants? 
+  #product-variants
+    - index = 0
+    - @product.grouped_option_values.each do |type, values|
+      - if type.name =~ /(.*)size(.*)/i
+        - cool_class = "variant-options index-"+index.to_s
+        %div{id: dom_id(type), class: cool_class}
+          %label= type.presentation
+          - select_opts = ["Select one"]
+          - disabled_opts = []
+          - values.sort_by(&:position).each do |v|
+            - unless (variants = @product.variants_for_option_value(v)).empty?
+              - if (variants.sum(&:total_on_hand) == 0)
+                - disabled_opts << v.name
+                - select_opts << [v.name + " out of stock", v.name, class: "out-of-stock option-value"]
+              - else
+                - select_opts << [v.name, class: "in-stock option-value", data:{rel: "#{type.id}-#{v.id}"}]
+          = select_tag type.presentation, options_for_select(select_opts, disabled: disabled_opts) , class: type.presentation+" variant-option-values"
+      - index += 1
+      - if type.name =~ /(.*)color(.*)/i
+        - cool_class = "variant-options index-"+index.to_s
+        %div{id: dom_id(type), class: cool_class}
+          %label= type.presentation
+          .colors
+            - values.sort_by(&:position).each do |v|
+              - unless (variants = @product.variants_for_option_value(v)).empty?
+                - outOfStockClass = (variants.sum(&:total_on_hand) == 0) ? "out-of-stock" : "in-stock"
+                = image_tag v.image.url, class: "color #{outOfStockClass} option-value", data:{rel: "#{type.id}-#{v.id}"}
+        / %ul.variant-option-values
+        / - values.sort_by(&:position).each do |value|
+        /   - classes = ["option-value"]
+        /   - unless (variants = @product.variants_for_option_value(value)).empty? 
+        /     - classes << (variants.sum(&:total_on_hand) > 0 ? "in-stock" : "out-of-stock" ) if index == 0
+        /     %li
+        /       = link_to value.has_image? ? image_tag(value.image.url, alt: value.presentation) : content_tag(:span, value.presentation), "#", title: value.presentation, class: classes.join(" "), rel: "#{type.id}-#{value.id}"
+        /   %li.clear-option
+        /     = link_to "X", "#clear", :class => "clear-button clear-index-#{index}"
+        /   %li.clear
+    = hidden_field_tag "products[#{@product.id}]", "", id: "variant_id", class: "hidden"
+    = render "init_variant_options_js"

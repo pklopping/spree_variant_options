@@ -44,15 +44,20 @@ function VariantOptions(params) {
 
   function init() {
     divs = $('#product-variants .variant-options');
-    disable(divs.find('a.option-value').addClass('locked'));
+    //Enable Colors
     update();
-    enable(parent.find('a.option-value'));
+    enable_size(parent.find('select.Size'));
+    //Enable Sizes
+    enable_color(parent.find('.colors'));
+    //Enable Colors
+    enable_size(parent.find('select.Size'));
+    //Enable Sizes
+    enable_color(parent.find('.color'));
     toggle();
-    $('.clear-option a.clear-button').hide().click(handle_clear);
 
     if (default_instock) {
       divs.each(function(){
-        $(this).find("ul.variant-option-values li a.in-stock:first").click();
+        $(this).find(".variant-option-values .in-stock:first").click();
       });
     }
   }
@@ -64,31 +69,47 @@ function VariantOptions(params) {
   function update(i) {
     index = isNaN(i) ? index : i;
     parent = $(divs.get(index));
-    buttons = parent.find('a.option-value');
-    parent.find('a.clear-button').hide();
+    buttons = parent.find('.option-value');
   }
 
   function disable(btns) {
     return btns.removeClass('selected');
   }
 
-  function enable(btns) {
+  function enable_size(btns) {
     bt = btns.not('.unavailable').removeClass('locked').unbind('click')
     if (!allow_select_outofstock && !allow_backorders)
       bt = bt.filter('.in-stock')
-    return bt.click(handle_click).filter('.auto-click').removeClass('auto-click').click();
+    return bt.change(handle_size_change).filter('.auto-click').removeClass('auto-click').click();
+  }
+
+  function enable_color(btns) {
+    bt = btns.not('.unavailable').removeClass('locked').unbind('click')
+    if (!allow_select_outofstock && !allow_backorders)
+      bt = bt.filter('.in-stock')
+    return bt.click(handle_color_change).filter('.auto-click').removeClass('auto-click').click();
   }
 
   function advance() {
     index++
     update();
     inventory(buttons.removeClass('locked'));
-    enable(buttons);
+    enable_size(buttons);
+    enable_color(buttons);
   }
 
   function inventory(btns) {
     var keys, variants, count = 0, selected = {};
-    var sels = $.map(divs.find('a.selected'), function(i) { return i.rel });
+    var sels = [];
+    // var sels = $.map(divs.find('.selected'), function(i) { 
+    //   return $(i).data('rel') 
+    // });
+    //Grab selected Size
+    var tmp = $('select.Size').val();
+    var opt = $('select.Size').find('option[value="'+tmp+'"]');
+    sels.push(opt.data('rel'));
+    //Grab selected color
+
     $.each(sels, function(key, value) {
       key = value.split('-');
       var v = options[key[0]][key[1]];
@@ -101,7 +122,7 @@ function VariantOptions(params) {
       }
     });
     btns.removeClass('in-stock out-of-stock unavailable').each(function(i, element) {
-      variants = get_variant_objects(element.rel);
+      variants = get_variant_objects($(element).data('rel'));
       keys = $.keys(variants);
       if (keys.length == 0) {
         disable($(element).addClass('unavailable locked').unbind('click'));
@@ -152,11 +173,15 @@ function VariantOptions(params) {
     return parseFloat(string.replace(/[^\d\.]/g, ''));
   }
 
-  function find_variant() {
-    var selected = divs.find('a.selected');
-    var variants = get_variant_objects(selected.get(0).rel);
+  function find_variant(selected_option) {
+    var selected = divs.find('.selected').not('li, select');
+    var variants = get_variant_objects(selected_option.data('rel'));
     if (selected.length == divs.length) {
-      return variant = variants[selection[0]];
+      if (count_variants(variants) == 1) {
+        return variant = variants[first_variant_key(variants)];
+      } else {
+        return variant = variants[selection[0]];
+      }
     } else {
       var prices = [];
       $.each(variants, function(key, value) { prices.push(value.price) });
@@ -169,6 +194,20 @@ function VariantOptions(params) {
         $('#product-price .price').html('<span class="price from">' + prices[0] + '</span> - <span class="price to">' + prices[prices.length - 1] + '</span>');
       }
       return false;
+    }
+  }
+
+  function count_variants(variants) {
+    count = 0;
+    for (key in variants) {
+      count++;
+    }
+    return count;
+  }
+
+  function first_variant_key(variants) {
+    for (key in variants) {
+      return key;
     }
   }
 
@@ -190,42 +229,72 @@ function VariantOptions(params) {
       price = $('#product-price .price').addClass('unselected')
       // Replace product price by "(select)" only when there are at least 1 variant not out-of-stock
       variants = $("div.variant-options.index-0")
-      if (variants.find("a.option-value.out-of-stock").length != variants.find("a.option-value").length)
+      if (variants.find(".option-value.out-of-stock").length != variants.find(".option-value").length)
         price.text('(select)');
     }
   }
 
-  function clear(i) {
+  function clear_size(i) {
     variant = null;
     update(i);
-    enable(buttons.removeClass('selected'));
+    enable_size(buttons.removeClass('selected'));
     toggle();
     parent.nextAll().each(function(index, element) {
-      disable($(element).find('a.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'));
-      $(element).find('a.clear-button').hide();
+      disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'));
+    });
+    show_all_variant_images();
+  }
+
+  function clear_color(i) {
+    variant = null;
+    update(i);
+    enable_color(buttons.removeClass('selected'));
+    toggle();
+    parent.nextAll().each(function(index, element) {
+      disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'));
     });
     show_all_variant_images();
   }
 
 
-  function handle_clear(evt) {
-    evt.preventDefault();
-    clear(get_index(this));
+  // function handle_clear(evt) {
+  //   evt.preventDefault();
+  //   clear(get_index(this));
+  // }
+
+  function handle_size_change(evt) {
+    variant = null;
+    selection = [];
+    var a = $(this);
+    a = a.find('option[value="'+a.val()+'"]')
+    selected_option = a
+    if (!parent.has(a).length) {
+      clear_size(divs.index(a.parents('.variant-options:first')));
+    }
+    disable(buttons);
+    if (a.val() != "Select one" && !a.is('li')) {
+      var a = enable_size(a.addClass('selected'));
+    }
+    advance();
+    if (find_variant(selected_option)) {
+      toggle();
+    }
   }
 
-  function handle_click(evt) {
+  function handle_color_change(evt) {
     evt.preventDefault();
     variant = null;
     selection = [];
     var a = $(this);
     if (!parent.has(a).length) {
-      clear(divs.index(a.parents('.variant-options:first')));
+      clear_color(divs.index(a.parents('.variant-options:first')));
     }
     disable(buttons);
-    var a = enable(a.addClass('selected'));
-    parent.find('a.clear-button').css('display', 'block');
+    if (a.val() != "Select one" && !a.is('li')) {
+      var a = enable_size(a.addClass('selected'));
+    }
     advance();
-    if (find_variant()) {
+    if (find_variant($(this))) {
       toggle();
     }
   }
