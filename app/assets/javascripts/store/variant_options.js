@@ -176,7 +176,6 @@ function VariantOptions(params) {
   function find_variant(selected_option) {
     var selected = divs.find('.selected').not('li, select');
     var variants = get_variant_objects(selected_option.data('rel'));
-    debugger
     if (selected.length == divs.length) {
       if (count_variants(variants) == 1) {
         return variant = variants[first_variant_key(variants)];
