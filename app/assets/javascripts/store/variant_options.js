@@ -282,6 +282,9 @@ function VariantOptions(params) {
   }
 
   function handle_color_change(evt) {
+    if ($(evt.target).hasClass('out-of-stock')){
+      return;
+    }
     evt.preventDefault();
     variant = null;
     selection = [];
