@@ -1,4 +1,5 @@
 var show_variant_images = function(variant_id) {
+  uninitProductImagesGallery();
   $('.li.vtmb').hide().removeClass("active");
   $('.li.tmb-' + variant_id).show().addClass("active");
   var currentThumb = $('#' + $("#main-image").data('selectedThumbId'));
@@ -17,6 +18,7 @@ var show_variant_images = function(variant_id) {
     $("#main-image").data('selectedThumb', newImg);
     $("#main-image").data('selectedThumbId', thumb.attr('id'));
   }
+  initProductImagesGallery();
 }
 
 var show_all_variant_images = function() {
