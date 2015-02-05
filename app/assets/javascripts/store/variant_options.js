@@ -36,6 +36,7 @@ function VariantOptions(params) {
   var allow_backorders = !params['track_inventory_levels'] ||  params['allow_backorders'];
   var allow_select_outofstock = params['allow_select_outofstock'];
   var default_instock = params['default_instock'];
+  var wrapper = params['wrapper'];
 
   var variant, divs, parent, index = 0;
   var selection = [];
@@ -213,22 +214,22 @@ function VariantOptions(params) {
 
   function toggle() {
     if (variant) {
-      $('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val(variant.id);
-      $('#product-price .price').removeClass('unselected').text(variant.price);
+      $(wrapper).find('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val(variant.id);
+      $(wrapper).find('#product-price .price').removeClass('unselected').text(variant.price);
       if (variant.count > 0 || allow_backorders)
-        $('#cart-form button[type=submit]').attr('disabled', false).fadeTo(100, 1);
-      $('form[data-form-type="variant"] button[type=submit]').attr('disabled', false).fadeTo(100, 1);
+        $(wrapper).find('#cart-form button[type=submit]').attr('disabled', false).fadeTo(100, 1);
+      $(wrapper).find('form[data-form-type="variant"] button[type=submit]').attr('disabled', false).fadeTo(100, 1);
       try {
         show_variant_images(variant.id);
       } catch(error) {
         // depends on modified version of product.js
       }
     } else {
-      $('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val('');
-      $('#cart-form button[type=submit], form[data-form-type="variant"] button[type=submit]').attr('disabled', true).fadeTo(0, 0.5);
-      price = $('#product-price .price').addClass('unselected')
+      $(wrapper).find('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val('');
+      $(wrapper).find('#cart-form button[type=submit], form[data-form-type="variant"] button[type=submit]').attr('disabled', true).fadeTo(0, 0.5);
+      price = $(wrapper).find('#product-price .price').addClass('unselected')
       // Replace product price by "(select)" only when there are at least 1 variant not out-of-stock
-      variants = $("div.variant-options.index-0")
+      variants = $(wrapper).find("div.variant-options.index-0")
       if (variants.find(".option-value.out-of-stock").length != variants.find(".option-value").length)
         price.text('(select)');
     }
