@@ -299,5 +299,6 @@ function VariantOptions(params) {
 
   $(document).ready(init);
   $(document).on('page:load', init);
+  $(document).on('page:change', init);
 
 };
