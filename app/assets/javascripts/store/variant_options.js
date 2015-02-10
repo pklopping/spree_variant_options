@@ -43,7 +43,7 @@ function VariantOptions(params) {
   var buttons;
 
 
-  function init() {
+  init = function() {
     divs = $(wrapper).find('#product-variants .variant-options');
     //Enable Colors
     update();
@@ -297,8 +297,7 @@ function VariantOptions(params) {
     }
   }
 
-  $(document).on('ready, page:load', function() {
-    init();
-  });
+  $(document).ready(init);
+  $(document).on('page:load', init);
 
 };
