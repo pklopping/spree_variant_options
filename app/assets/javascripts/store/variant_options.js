@@ -297,6 +297,8 @@ function VariantOptions(params) {
     }
   }
 
-  $(document).on('ready, page:load', init);
+  $(document).on('ready, page:load', function() {
+    init();
+  });
 
 };
