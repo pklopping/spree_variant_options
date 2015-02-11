@@ -1,18 +1,18 @@
--binding.pry()
 %tr.line-item
-%td.cart-item-image
-  - if variant.images.length == 0
-    = link_to small_image(variant.product), variant.product
-  - else
-    = link_to image_tag(variant.images.first.attachment.url(:small)), variant.product
-%td.cart-item-title
-  %h4= link_to line_item.name, product_path(variant.product)
-  = link_to 'Remove', '#', class: "delete"
-%td.lead.text-primary.cart-item-price
-  = line_item.single_money.to_html
-%td.cart-item-quantity
-  = item_form.number_field :quantity, min: 0, class: "form-control line_item_quantity", size: 5
-%td.text-primary.cart-item-color
-  = variant.option_value('tshirt-color') unless line_item.quantity.nil?
-%td.text-primary.cart-item-size
-  = variant.option_value('tshirt-size') unless line_item.quantity.nil?
+  %td.cart-item-image
+    - if variant.images.length == 0
+      = link_to small_image(variant.product), variant.product
+    - else
+      = link_to image_tag(variant.images.first.attachment.url(:small)), variant.product
+  %td.cart-item-title
+    %h4= link_to line_item.name, product_path(variant.product)
+    = link_to 'Remove', '#', class: "delete"
+  %td.lead.text-primary.cart-item-price
+    = line_item.single_money.to_html
+  %td.cart-item-quantity
+    = item_form.number_field :quantity, min: 0, class: "form-control line_item_quantity", size: 5
+  %td.text-primary.cart-item-color
+    = variant.option_value('tshirt-color') unless line_item.quantity.nil?
+  %td.text-primary.cart-item-size
+    = variant.option_value('tshirt-size') unless line_item.quantity.nil?
+= render "spree/orders/init_line_item_variant_options_js", line_item: line_item

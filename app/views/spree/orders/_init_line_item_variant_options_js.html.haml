@@ -1,7 +1,7 @@
 :javascript
   var variant_options = new VariantOptions({
-    wrapper: "#product_#{@product.id.to_s}, #quick_view_#{@product.id.to_s}",
-    options: #{@product.variant_options_hash.to_json},
+    wrapper: "#product_#{line_item.product.id.to_s}, #quick_view_#{line_item.product.id.to_s}",
+    options: #{line_item.product.variant_options_hash.to_json},
     track_inventory_levels: "#{!!Spree::Config[:track_inventory_levels]}",
     allow_backorders: false,
     allow_select_outofstock: "#{!!SpreeVariantOptions::VariantConfig[:allow_select_outofstock]}",
