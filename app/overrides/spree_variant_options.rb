@@ -4,6 +4,12 @@ Deface::Override.new(:virtual_path   => "spree/products/_cart_form",
                      :partial        => "spree/products/variant_options",
                      :disabled       => false)
 
+Deface::Override.new(:virtual_path   => "spree/orders/_line_item",
+                     :name           => "spree_cart_quick_view_variant_options",
+                     :replace        => "tr.line-item",
+                     :partial        => "spree/orders/line_item_variants",
+                     :disabled       => false)
+
 Deface::Override.new(:virtual_path   => "spree/admin/option_types/edit",
                      :name           => "admin_option_value_table_headers",
                      :replace        => "thead[data-hook=option_header]",
