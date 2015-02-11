@@ -1,4 +1,5 @@
-%tr.line-item
+- line_item_class = "line-item line-item-#{line_item.id.to_s}"
+%tr{class: line_item_class}
   %td.cart-item-image
     - if variant.images.length == 0
       = link_to small_image(variant.product), variant.product
