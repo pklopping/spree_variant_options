@@ -18,13 +18,13 @@
     - if type.name =~ /(.*)size(.*)/i
       - cool_class = "text-primary cart-item-color variant-options index-"+index.to_s
       %td{id: dom_id(type), class: cool_class}
-        - select_opts = []
-        - disabled_opts = []
+        - select_opts = ["Select One"]
+        - disabled_opts = ["Select One"]
         - values.sort_by(&:position).each do |v|
           - unless (variants = line_item.product.variants_for_option_value(v)).empty?
             - if (variants.sum(&:total_on_hand) == 0)
               - disabled_opts << v.name
-              - select_opts << [v.name + " out of stock", v.name, class: "out-of-stock option-value", data:{rel: "#{type.id}-#{v.id}"}]
+              - select_opts << [v.name + " sold out", v.name, class: "out-of-stock option-value", data:{rel: "#{type.id}-#{v.id}"}]
             - else
               - select_opts << [v.name, class: "in-stock option-value", data:{rel: "#{type.id}-#{v.id}"}]
         - pre_selected_option = (values & variant.option_values).first.name
@@ -33,17 +33,17 @@
     - if type.name =~ /(.*)color(.*)/i
       - cool_class = "text-primary cart-item-size variant-options index-"+index.to_s
       %td{id: dom_id(type), class: cool_class}
-        - select_opts = []
-        - disabled_opts = []
+        - select_opts = ["Select One"]
+        - disabled_opts = ["Select One"]
         - values.sort_by(&:position).each do |v|
           - unless (variants = line_item.product.variants_for_option_value(v)).empty?
             - if (variants.sum(&:total_on_hand) == 0)
               - disabled_opts << v.name
-              - select_opts << [v.name + " out of stock", v.name, class: "out-of-stock option-value", data:{rel: "#{type.id}-#{v.id}"}]
+              - select_opts << [v.name + " sold out", v.name, class: "out-of-stock option-value", data:{rel: "#{type.id}-#{v.id}"}]
             - else
               - select_opts << [v.name, class: "in-stock option-value", data:{rel: "#{type.id}-#{v.id}"}]
         - pre_selected_option = (values & variant.option_values).first.name
         = select_tag type.presentation, options_for_select(select_opts, selected: pre_selected_option, disabled: disabled_opts) , class: type.presentation+" variant-option-values"
-
+    = item_form.hidden_field :variant_id, id: "variant_id", class: "hidden"
 
 = render "spree/orders/init_line_item_variant_options_js", line_item: line_item
