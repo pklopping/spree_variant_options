@@ -5,11 +5,6 @@ $.extend
       a.push k
     return a
 
-Array.prototype.indexOf = (obj) ->
-  for i in this.length by 1
-    if (this[i] == obj)
-      return i
-  return -1
 
 Array.find_matches = (a) ->
   m = []
@@ -72,7 +67,7 @@ class window.VariantOptions
   update: (i) ->
     @index = if isNaN(i) then @index else i
     @parent = $(@divs.get(@index))
-    buttons = @parent.find('.option-value')
+    @buttons = @parent.find('.option-value')
 
   disable: (btns) ->
     return btns.removeClass('selected')
@@ -101,9 +96,9 @@ class window.VariantOptions
   advance: () ->
     @index = @index + 1
     @update()
-    @inventory(buttons.removeClass('locked'))
-    @enable_size(buttons)
-    @enable_color(buttons)
+    @inventory(@buttons.removeClass('locked'))
+    @enable_size(@buttons)
+    @enable_color(@buttons)
 
   inventory: (btns) ->
     keys = undefined
@@ -120,7 +115,7 @@ class window.VariantOptions
 
     $.each sels, (key, value) =>
       key = value.split('-')
-      v = options[key[0]][key[1]]
+      v = @options[key[0]][key[1]]
       keys = $.keys(v)
       m = Array.find_matches(@selection.concat(keys))
       if @selection.length == 0
@@ -170,11 +165,11 @@ class window.VariantOptions
     # var otid, ovid, opt, opv;
     i = rels.length;
     try
-      while (i = i - 1)
+      while (i--)
         ids = rels[i].split('-')
         otid = ids[0]
         ovid = ids[1]
-        opt = options[otid]
+        opt = @options[otid]
         if (opt)
           opv = opt[ovid]
           ids = $.keys(opv)
@@ -229,7 +224,7 @@ class window.VariantOptions
         $(@wrapper).find('#cart-form button[type=submit]').attr('disabled', false).fadeTo(100, 1);
       $(@wrapper).find('form[data-form-type="variant"] button[type=submit]').attr('disabled', false).fadeTo(100, 1);
       try
-        show_variant_images(@variant.id)
+        @show_variant_images(@variant.id)
       catch error
         # depends on modified version of product.js
     else
@@ -244,20 +239,20 @@ class window.VariantOptions
   clear_size: (i) ->
     @variant = null
     @update(i)
-    @enable_size(buttons.removeClass('selected'))
+    @enable_size(@buttons.removeClass('selected'))
     @toggle()
     @parent.nextAll().each (index, element) =>
       @disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'))
-    @show_all_variant_images();
+    show_all_variant_images();
 
   clear_color: (i) ->
     @variant = null
     @update(i)
-    @enable_color(buttons.removeClass('selected'))
+    @enable_color(@buttons.removeClass('selected'))
     @toggle()
     @parent.nextAll().each (index, element) ->
       @disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'))
-    @show_all_variant_images();
+    show_all_variant_images();
 
   handle_size_change: (evt) ->
     @variant = null
@@ -267,7 +262,7 @@ class window.VariantOptions
     @selected_option = a
     if (!@parent.has(a).length)
       @clear_size(@divs.index(a.parents('.variant-options:first')))
-    @disable(buttons);
+    @disable(@buttons);
     if (a.val() != "Select one" && !a.is('li'))
       a = @enable_size(a.addClass('selected'));
     @advance()
@@ -284,7 +279,7 @@ class window.VariantOptions
     a = $(evt.target);
     if (!@parent.has(a).length)
       @clear_color(@divs.index(a.parents('.variant-options:first')))
-    @disable(buttons)
+    @disable(@buttons)
     if (a.val() != "Select one" && !a.is('li'))
       a = @enable_size(a.addClass('selected'))
     @advance();
