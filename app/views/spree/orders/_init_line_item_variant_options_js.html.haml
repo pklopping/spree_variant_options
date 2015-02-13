@@ -1,10 +1,9 @@
-:javascript
-  var variant_options = new VariantOptions({
-  	isCart: true,
-    wrapper: "tr.line-item-#{line_item.id.to_s}",
-    options: #{line_item.product.variant_options_hash.to_json},
-    track_inventory_levels: "#{!!Spree::Config[:track_inventory_levels]}",
-    allow_backorders: false,
-    allow_select_outofstock: "#{!!SpreeVariantOptions::VariantConfig[:allow_select_outofstock]}",
+:coffeescript
+  new VariantOptions
+    isCart: true
+    wrapper: "tr.line-item-#{line_item.id.to_s}"
+    options: #{line_item.product.variant_options_hash.to_json}
+    track_inventory_levels: "#{!!Spree::Config[:track_inventory_levels]}"
+    allow_backorders: false
+    allow_select_outofstock: "#{!!SpreeVariantOptions::VariantConfig[:allow_select_outofstock]}"
     default_instock: "#{!!SpreeVariantOptions::VariantConfig[:default_instock]}"
-  });

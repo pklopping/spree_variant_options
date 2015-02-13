@@ -22,7 +22,7 @@ Array.find_matches = (a) ->
     return false
   return m
 
-class window.Filmstrip
+class window.VariantOptions
 
   constructor: (params) ->
 
@@ -40,28 +40,29 @@ class window.Filmstrip
     @selection = []
     @buttons
 
-    @colorButtons = (isCart) ? 'select.Color' : '.colors'
+    @colorButtons = (@isCart) ? 'select.Color' : '.colors'
 
+    @init()
 
   init: ->
     @divs = $(@wrapper).find('.variant-options');
     #Enable Colors
     @update();
-    @enable_size(parent.find('select.Size'))
+    @enable_size(@parent.find('select.Size'))
     #Enable Sizes
-    @enable_color(parent.find(@colorButtons))
+    @enable_color(@parent.find(@colorButtons))
     #Enable Colors
-    @enable_size(parent.find('select.Size'))
+    @enable_size(@parent.find('select.Size'))
     #Enable Sizes
-    @enable_color(parent.find(@colorButtons))
+    @enable_color(@parent.find(@colorButtons))
 
-    if isCart
+    if @isCart
       $(@wrapper).find('select.Size').trigger('change')
       $(@wrapper).find('select.Color').trigger('change')
 
-    toggle()
+    @toggle()
 
-    if default_instock
+    if @default_instock
       @divs.each ->
         $(this).find(".variant-option-values .in-stock:first").click()
 
@@ -69,9 +70,9 @@ class window.Filmstrip
     parseInt($(parent).attr('class').replace(/[^\d]/g, ''))
 
   update: (i) ->
-    @index = if isNaN(i) then index else i
-    parent = $(divs.get(index))
-    buttons = parent.find('.option-value')
+    @index = if isNaN(i) then @index else i
+    @parent = $(@divs.get(@index))
+    buttons = @parent.find('.option-value')
 
   disable: (btns) ->
     return btns.removeClass('selected')
@@ -80,16 +81,22 @@ class window.Filmstrip
     bt = btns.not('.unavailable').removeClass('locked').unbind('click')
     if (!@allow_select_outofstock && !@allow_backorders)
       bt = bt.filter('.in-stock')
-    bt.off('change').change(handle_size_change).filter('.auto-click').removeClass('auto-click').click()
+    bt.off('change').on('change', (event) =>
+      @handle_size_change(event)
+    ).filter('.auto-click').removeClass('auto-click').click()
 
   enable_color: (btns) ->
     bt = btns.not('.unavailable').removeClass('locked').unbind('click')
     if (!@allow_select_outofstock && !@allow_backorders)
       bt = bt.filter('.in-stock')
-    if isCart
-      bt.parent().off('change').change(handle_color_change).filter('.auto-click').removeClass('auto-click').click()
+    if @isCart
+      bt.parent().off('change').on('change', (event) =>
+        @handle_color_change(event)
+      ).filter('.auto-click').removeClass('auto-click').click()
     else
-      bt.off('click').click(handle_color_change).filter('.auto-click').removeClass('auto-click').click()
+      bt.off('click').on('click', (event) =>
+        @handle_color_change(event)
+      ).filter('.auto-click').removeClass('auto-click').click()
 
   advance: () ->
     @index = @index + 1
@@ -131,7 +138,7 @@ class window.Filmstrip
           $(element).parent().trigger("modified")
       else if (keys.length == 1)
         _var = variants[keys[0]]
-        if (allow_backorders || _var.count)
+        if (@allow_backorders || _var.count)
           if @selection.length == 1
             class_to_add = 'in-stock auto-click' 
           else
@@ -142,7 +149,7 @@ class window.Filmstrip
         if ($(element).hasClass('out-of-stock') && $(element).is('option'))
           $(element).attr('disabled','true')
           $(element).parent().trigger("modified")
-      else if (allow_backorders)
+      else if (@allow_backorders)
         $(element).addClass('in-stock');
       else
         $.each variants, (key, value) =>
@@ -185,23 +192,23 @@ class window.Filmstrip
     parseFloat(string.replace(/[^\d\.]/g, ''))
 
   find_variant: (selected_option) ->
-    selected = divs.find('.selected').not('li, select')
-    variants = @get_variant_objects( if (isCart) then selected.data('rel') else selected_option.data('rel'))
-    if (selected.length == divs.length)
-      if (count_variants(variants) == 1)
-        return variant = variants[first_variant_key(variants)]
+    selected = @divs.find('.selected').not('li, select')
+    variants = @get_variant_objects( if (@isCart) then selected.data('rel') else selected_option.data('rel'))
+    if (selected.length == @divs.length)
+      if (@count_variants(variants) == 1)
+        return @variant = variants[@first_variant_key(variants)]
       else
-        return variant = variants[@selection[0]]
+        return @variant = variants[@selection[0]]
     else
       prices = []
       $.each variants, (key, value) =>
         prices.push(value.price)
       prices = $.unique(prices).sort (a, b) =>
-        return if (to_f(a) < to_f(b)) then -1 else 1
+        return if (@to_f(a) < @to_f(b)) then -1 else 1
       if (prices.length == 1)
-        $(wrapper).find('.price').html('<span class="price assumed">' + prices[0] + '</span>')
+        $(@wrapper).find('.price').html('<span class="price assumed">' + prices[0] + '</span>')
       else
-        $(wrapper).find('.price').html('<span class="price from">' + prices[0] + '</span> - <span class="price to">' + prices[prices.length - 1] + '</span>')
+        $(@wrapper).find('.price').html('<span class="price from">' + prices[0] + '</span> - <span class="price to">' + prices[prices.length - 1] + '</span>')
       false
 
   count_variants: (variants) ->
@@ -215,22 +222,22 @@ class window.Filmstrip
       return key
 
   toggle: () ->
-    if (variant)
-      $(wrapper).find('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val(variant.id)
-      $(wrapper).find('#product-price .price').removeClass('unselected').text(variant.price);
-      if (variant.count > 0 || allow_backorders)
-        $(wrapper).find('#cart-form button[type=submit]').attr('disabled', false).fadeTo(100, 1);
-      $(wrapper).find('form[data-form-type="variant"] button[type=submit]').attr('disabled', false).fadeTo(100, 1);
+    if (@variant)
+      $(@wrapper).find('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val(@variant.id)
+      $(@wrapper).find('#product-price .price').removeClass('unselected').text(@variant.price);
+      if (@variant.count > 0 || @allow_backorders)
+        $(@wrapper).find('#cart-form button[type=submit]').attr('disabled', false).fadeTo(100, 1);
+      $(@wrapper).find('form[data-form-type="variant"] button[type=submit]').attr('disabled', false).fadeTo(100, 1);
       try
-        show_variant_images(variant.id)
+        show_variant_images(@variant.id)
       catch error
         # depends on modified version of product.js
     else
-      $(wrapper).find('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val('')
-      $(wrapper).find('#cart-form button[type=submit], form[data-form-type="variant"] button[type=submit]').attr('disabled', true).fadeTo(0, 0.5)
-      price = $(wrapper).find('#product-price .price').addClass('unselected')
+      $(@wrapper).find('#variant_id, form[data-form-type="variant"] input[name$="[variant_id]"]').val('')
+      $(@wrapper).find('#cart-form button[type=submit], form[data-form-type="variant"] button[type=submit]').attr('disabled', true).fadeTo(0, 0.5)
+      price = $(@wrapper).find('#product-price .price').addClass('unselected')
       # Replace product price by "(select)" only when there are at least 1 variant not out-of-stock
-      variants = $(wrapper).find("div.variant-options.index-0")
+      variants = $(@wrapper).find("div.variant-options.index-0")
       if (variants.find(".option-value.out-of-stock").length != variants.find(".option-value").length)
         price.text('(select)')
 
@@ -239,7 +246,7 @@ class window.Filmstrip
     @update(i)
     @enable_size(buttons.removeClass('selected'))
     @toggle()
-    parent.nextAll().each (index, element) =>
+    @parent.nextAll().each (index, element) =>
       @disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'))
     @show_all_variant_images();
 
@@ -248,18 +255,18 @@ class window.Filmstrip
     @update(i)
     @enable_color(buttons.removeClass('selected'))
     @toggle()
-    parent.nextAll().each (index, element) ->
+    @parent.nextAll().each (index, element) ->
       @disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'))
     @show_all_variant_images();
 
   handle_size_change: (evt) ->
     @variant = null
-    selection = []
-    a = $(this)
+    @selection = []
+    a = $(evt.target)
     a = a.find('option[value="'+a.val()+'"]')
     @selected_option = a
-    if (!parent.has(a).length)
-      @clear_size(divs.index(a.parents('.variant-options:first')))
+    if (!@parent.has(a).length)
+      @clear_size(@divs.index(a.parents('.variant-options:first')))
     @disable(buttons);
     if (a.val() != "Select one" && !a.is('li'))
       a = @enable_size(a.addClass('selected'));
@@ -274,16 +281,12 @@ class window.Filmstrip
     evt.preventDefault()
     @variant = null;
     @selection = [];
-    a = $(this);
-    if (!parent.has(a).length)
-      @clear_color(divs.index(a.parents('.variant-options:first')))
+    a = $(evt.target);
+    if (!@parent.has(a).length)
+      @clear_color(@divs.index(a.parents('.variant-options:first')))
     @disable(buttons)
     if (a.val() != "Select one" && !a.is('li'))
       a = @enable_size(a.addClass('selected'))
     @advance();
     if (@find_variant($(this)))
       @toggle();
-
-  $(document).ready(init);
-  $(document).on('page:load', init);
-  $(document).on('page:change', init);
