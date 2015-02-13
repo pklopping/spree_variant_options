@@ -90,7 +90,7 @@ function VariantOptions(params) {
     bt = btns.not('.unavailable').removeClass('locked').unbind('click')
     if (!allow_select_outofstock && !allow_backorders)
       bt = bt.filter('.in-stock')
-    return bt.change(handle_size_change).filter('.auto-click').removeClass('auto-click').click();
+    return bt.off('change').change(handle_size_change).filter('.auto-click').removeClass('auto-click').click();
   }
 
   function enable_color(btns) {
@@ -98,9 +98,9 @@ function VariantOptions(params) {
     if (!allow_select_outofstock && !allow_backorders)
       bt = bt.filter('.in-stock')
     if (isCart) {
-      return bt.parent().change(handle_color_change).filter('.auto-click').removeClass('auto-click').click();
+      return bt.parent().off('change').change(handle_color_change).filter('.auto-click').removeClass('auto-click').click();
     } else {
-      return bt.click(handle_color_change).filter('.auto-click').removeClass('auto-click').click();
+      return bt.off('click').click(handle_color_change).filter('.auto-click').removeClass('auto-click').click();
     }
   }
 
