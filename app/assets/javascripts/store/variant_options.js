@@ -37,10 +37,13 @@ function VariantOptions(params) {
   var allow_select_outofstock = params['allow_select_outofstock'];
   var default_instock = params['default_instock'];
   var wrapper = params['wrapper'];
+  var isCart = params['isCart']
 
   var variant, divs, parent, index = 0;
   var selection = [];
   var buttons;
+
+  var colorButtons = (isCart) ? 'select.Color' : '.colors'
 
 
   init = function() {
@@ -49,11 +52,17 @@ function VariantOptions(params) {
     update();
     enable_size(parent.find('select.Size'));
     //Enable Sizes
-    enable_color(parent.find('.colors'));
+    enable_color(parent.find(colorButtons));
     //Enable Colors
     enable_size(parent.find('select.Size'));
     //Enable Sizes
-    enable_color(parent.find('.color'));
+    enable_color(parent.find(colorButtons));
+
+    if (isCart){
+      $(wrapper).find('select.Size').trigger('change');
+      $(wrapper).find('select.Color').trigger('change');
+    }
+
     toggle();
 
     if (default_instock) {
@@ -88,7 +97,11 @@ function VariantOptions(params) {
     bt = btns.not('.unavailable').removeClass('locked').unbind('click')
     if (!allow_select_outofstock && !allow_backorders)
       bt = bt.filter('.in-stock')
-    return bt.click(handle_color_change).filter('.auto-click').removeClass('auto-click').click();
+    if (isCart) {
+      return bt.parent().change(handle_color_change).filter('.auto-click').removeClass('auto-click').click();
+    } else {
+      return bt.click(handle_color_change).filter('.auto-click').removeClass('auto-click').click();
+    }
   }
 
   function advance() {
@@ -108,6 +121,7 @@ function VariantOptions(params) {
     //Grab selected Size
     var tmp = $(wrapper).find('select.Size').val();
     var opt = $(wrapper).find('select.Size').find('option[value="'+tmp+'"]');
+    // var opt = $(wrapper).find('select.Size').find(':selected');
     sels.push(opt.data('rel'));
     //Grab selected color
 
@@ -193,7 +207,7 @@ function VariantOptions(params) {
 
   function find_variant(selected_option) {
     var selected = divs.find('.selected').not('li, select');
-    var variants = get_variant_objects(selected_option.data('rel'));
+    var variants = get_variant_objects( (isCart) ? selected.data('rel') : selected_option.data('rel'));
     if (selected.length == divs.length) {
       if (count_variants(variants) == 1) {
         return variant = variants[first_variant_key(variants)];
@@ -294,6 +308,7 @@ function VariantOptions(params) {
   }
 
   function handle_color_change(evt) {
+    console.log("YEE");
     if ($(evt.target).hasClass('out-of-stock')){
       return;
     }
