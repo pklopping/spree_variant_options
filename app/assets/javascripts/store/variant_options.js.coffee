@@ -188,7 +188,7 @@ class window.VariantOptions
 
   find_variant: (selected_option) ->
     selected = @divs.find('.selected').not('li, select')
-    variants = @get_variant_objects( if (@isCart) then selected.data('rel') else selected_option.data('rel'))
+    variants = @get_variant_objects(selected.data('rel'))
     if (selected.length == @divs.length)
       if (@count_variants(variants) == 1)
         return @variant = variants[@first_variant_key(variants)]
@@ -222,7 +222,7 @@ class window.VariantOptions
       $(@wrapper).find('#product-price .price').removeClass('unselected').text(@variant.price);
       if (@variant.count > 0 || @allow_backorders)
         $(@wrapper).find('#cart-form button[type=submit]').attr('disabled', false).fadeTo(100, 1);
-      $(@wrapper).find('form[data-form-type="variant"] button[type=submit]').attr('disabled', false).fadeTo(100, 1);
+      $(@wrapper).find('button[type=submit]').attr('disabled', false).fadeTo(100, 1);
       try
         @show_variant_images(@variant.id)
       catch error
@@ -250,7 +250,7 @@ class window.VariantOptions
     @update(i)
     @enable_color(@buttons.removeClass('selected'))
     @toggle()
-    @parent.nextAll().each (index, element) ->
+    @parent.nextAll().each (index, element) =>
       @disable($(element).find('.option-value').show().removeClass('in-stock out-of-stock').addClass('locked').unbind('click'))
     show_all_variant_images();
 
@@ -281,7 +281,7 @@ class window.VariantOptions
       @clear_color(@divs.index(a.parents('.variant-options:first')))
     @disable(@buttons)
     if (a.val() != "Select one" && !a.is('li'))
-      a = @enable_size(a.addClass('selected'))
+      a = @enable_color(a.addClass('selected'))
     @advance();
     if (@find_variant($(this)))
       @toggle();
