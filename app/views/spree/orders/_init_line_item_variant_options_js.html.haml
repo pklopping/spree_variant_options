@@ -1,5 +1,7 @@
 :coffeescript
-  new VariantOptions
+  unless (window.variant_option_controllers)
+  	window.variant_option_controllers = []
+  window.variant_option_controllers.push new VariantOptions
     isCart: true
     wrapper: "tr.line-item-#{line_item.id.to_s}"
     options: #{line_item.product.variant_options_hash.to_json}
